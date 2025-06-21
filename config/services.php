@@ -32,8 +32,8 @@ return [
     ],
     // …
     'trumelabs' => [
-        'base' => env('TRUMELABS_BASE'),
-        'key'  => env('TRUMELABS_KEY'),
-    ],
+    'api_key' => env('TRUMELABS_API_KEY'),
+    'base_url' => env('TRUMELABS_BASE_URL'),
+],
 
 ];

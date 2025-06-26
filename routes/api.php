@@ -7,5 +7,5 @@ use App\Http\Controllers\TrumeLabsController;
 Route::post('/trumelabs/user', [TrumeLabsController::class, 'createUser']);
 Route::post('/trumelabs/kit', [TrumeLabsController::class, 'registerKit']);
 Route::get('/trumelabs/results/{kitId}', [TrumeLabsController::class, 'getResults']);
-
+Route::post('/trumelabs/mock', [TrumeLabsController::class, 'getMock']);
 

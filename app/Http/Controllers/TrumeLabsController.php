@@ -44,4 +44,12 @@ class TrumeLabsController extends Controller
         $response = $this->trumeLabs->getResults($kitId);
         return response()->json($response);
     }
+
+
+     // 3. Mock Result
+     public function getMock($mock_kitId)
+     {
+         $response = $this->trumeLabs->getMock($mock_kitId);
+         return response()->json($response);
+     }
 }

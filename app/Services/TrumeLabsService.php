@@ -42,11 +42,16 @@ class TrumeLabsService
 
     public function registerKit($kitData)
     {
-        return $this->request('post', '/v1/generate-kits', $kitData);
+        return $this->request('post', '/v1/generate-kits', data: $kitData);
     }
 
     public function getResults($kitId)
     {
         return $this->request('get', "/v1/kits/{$kitId}/results");
+    }
+
+    public function getMock($mock_kitId)
+    {
+        return $this->request('post', "/v1/mock-kit-result", data: $mock_kitId);
     }
 }

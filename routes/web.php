@@ -13,8 +13,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/login', 'auth.login')->name('login');
+Route::get('/', fn() => view('auth.login'))->name('login');
 Route::view('/register', 'auth.register')->name('register');
 Route::view('/users', 'dashboard.users')->name('users');
 Route::view('/kits', 'dashboard.kits')->name('kits');
 Route::view('/settings', 'dashboard.settings')->name('settings');
+Route::view('/dashboard', 'dashboard.index')->name('dashboard');
+
+Route::post('/login', function () {
+    return redirect()->route('dashboard');
+});

@@ -5,17 +5,21 @@
     <div class="w-full max-w-md bg-white rounded-xl shadow-md p-8 space-y-6">
         <h2 class="text-2xl font-bold text-center text-gray-800">Log in</h2>
         
-        <form method="POST" action="{{ route('login') }}" class="space-y-4">
+        <form method="POST" action="{{ url('/login') }}">
             @csrf
             
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input id="email" name="email" type="email" required autofocus
+                {{-- <input id="email" name="email" type="email" required autofocus
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300" /> --}}
+                <input id="email" name="email" required autofocus
                     class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300" />
             </div>
 
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                {{-- <input id="password" name="password" type="password" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300" /> --}}
                 <input id="password" name="password" type="password" required
                     class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300" />
             </div>

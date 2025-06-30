@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/login', 'auth.login')->name('login');
 Route::view('/register', 'auth.register')->name('register');
-
-Route::get('/home', function () {
-    return view('home');
-});
+Route::view('/users', 'dashboard.users')->name('users');
+Route::view('/kits', 'dashboard.kits')->name('kits');
+Route::view('/settings', 'dashboard.settings')->name('settings');

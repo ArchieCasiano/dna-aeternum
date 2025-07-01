@@ -23,3 +23,7 @@ Route::view('/dashboard', 'dashboard.index')->name('dashboard');
 Route::post('/login', function () {
     return redirect()->route('dashboard');
 });
+
+Route::post('/users', function () {
+    return redirect()->route('users');
+})->name('users.store');

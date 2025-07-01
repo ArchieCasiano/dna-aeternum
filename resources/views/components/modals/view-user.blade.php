@@ -5,8 +5,12 @@
         <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6 relative">
             <h2 class="text-xl font-bold mb-4">User Details</h2>
 
-            <table class="w-full text-sm text-left text-gray-800 border border-gray-200 rounded">
+            <table class="w-full text-sm text-left text-gray-800 border border-gray-200 rounded-2xl">
                 <tbody>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 font-medium w-1/3">ID</th>
+                        <td class="py-2 px-4">{{ $user->id }}</td>
+                    </tr>
                     <tr class="border-b">
                         <th class="py-2 px-4 font-medium w-1/3">Name</th>
                         <td class="py-2 px-4">{{ $user->first_name }} {{ $user->last_name }}</td>

@@ -28,7 +28,7 @@
                         <td class="px-6 py-4">{{ $user->gender }}</td>
                         <td class="px-6 py-4 space-x-2 flex flex-row">
                             @include('components.modals.view-user', ['user' => $user])
-                            <a href="#" class="text-yellow-600 hover:underline">Edit</a>
+                            @include('components.modals.edit-user', ['user' => $user])
                         </td>
                     </tr>
                 @endforeach

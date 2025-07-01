@@ -27,6 +27,10 @@ Route::post('/login', function () {
 Route::post('/users', function () {
     return redirect()->route('users');
 })->name('users.store');
+Route::put('/users/{id}', function ($id) {
+    return redirect()->route('users')->with('success', 'User updated (fake).');
+})->name('users.update');
+
 
 Route::view('/users', 'dashboard.users', [
     'users' => [

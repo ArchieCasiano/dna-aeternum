@@ -85,7 +85,7 @@
             </form>
 
             <button @click="open = false"
-                class="absolute top-2 right-2 text-gray-500 hover:text-black text-xl cursor-pointer">
+                class="absolute top-2 right-4 text-gray-500 hover:text-black text-xl cursor-pointer">
                 &times;
             </button>
         </div>

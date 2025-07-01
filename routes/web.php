@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => view('auth.login'))->name('login');
 Route::view('/register', 'auth.register')->name('register');
-Route::view('/users', 'dashboard.users')->name('users');
+// Route::view('/users', 'dashboard.users')->name('users');
 Route::view('/kits', 'dashboard.kits')->name('kits');
 Route::view('/settings', 'dashboard.settings')->name('settings');
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');
@@ -27,3 +27,32 @@ Route::post('/login', function () {
 Route::post('/users', function () {
     return redirect()->route('users');
 })->name('users.store');
+
+Route::view('/users', 'dashboard.users', [
+    'users' => [
+        (object) [
+            'id' => 1,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@example.com',
+            'date_of_birth' => '1994-06-17',
+            'allow_trume_login' => false,
+            'biological_sex' => 'Male',
+            'gender' => 'Male',
+            'country' => 'United States Of America',
+            'ethnicity' => 'White'
+        ],
+        (object) [
+            'id' => 2,
+            'first_name' => 'Jane',
+            'last_name' => 'Smith',
+            'email' => 'jane@example.com',
+            'date_of_birth' => '1992-03-25',
+            'allow_trume_login' => true,
+            'biological_sex' => 'Female',
+            'gender' => 'Female',
+            'country' => 'Canada',
+            'ethnicity' => 'Asian'
+        ]
+    ]
+])->name('users');

@@ -19,18 +19,19 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
-                <tr>
-                    <td class="px-6 py-4">12345</td>
-                    <td class="px-6 py-4">Jane Doe</td>
-                    <td class="px-6 py-4">jane@example.com</td>
-                    <td class="px-6 py-4">United States</td>
-                    <td class="px-6 py-4">Female</td>
-                    <td class="px-6 py-4 space-x-2">
-                        <a href="#" class="text-blue-600 hover:underline">View</a>
-                        <a href="#" class="text-yellow-600 hover:underline">Edit</a>
-                    </td>
-                </tr>
-                {{-- More rows dynamically later --}}
+                @foreach ($users as $user)
+                    <tr>
+                        <td class="px-6 py-4">{{ $user->id }}</td>
+                        <td class="px-6 py-4">{{ $user->first_name }} {{ $user->last_name }}</td>
+                        <td class="px-6 py-4">{{ $user->email }}</td>
+                        <td class="px-6 py-4">{{ $user->country }}</td>
+                        <td class="px-6 py-4">{{ $user->gender }}</td>
+                        <td class="px-6 py-4 space-x-2 flex flex-row">
+                            @include('components.modals.view-user', ['user' => $user])
+                            <a href="#" class="text-yellow-600 hover:underline">Edit</a>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

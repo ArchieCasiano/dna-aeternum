@@ -27,6 +27,7 @@ Route::post('/login', function () {
 Route::post('/users', function () {
     return redirect()->route('users');
 })->name('users.store');
+
 Route::put('/users/{id}', function ($id) {
     return redirect()->route('users')->with('success', 'User updated (fake).');
 })->name('users.update');
@@ -60,3 +61,81 @@ Route::view('/users', 'dashboard.users', [
         ]
     ]
 ])->name('users');
+
+Route::get('/kits', function () {
+    $registeredKits = [
+        [
+            'barcode' => 'KIT123456',
+            'user' => 'John Doe',
+            'user_details' => [
+                'id' => 1,
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'email' => 'john@example.com',
+                'gender' => 'Male',
+                'biological_sex' => 'Male',
+                'date_of_birth' => '1994-06-17',
+                'country' => 'United States',
+                'ethnicity' => 'White',
+                'allow_trume_login' => true,
+            ]
+        ],
+        [
+            'barcode' => 'KIT654321',
+            'user' => 'Jane Doe',
+            'user_details' => [
+                'id' => 2,
+                'first_name' => 'Jane',
+                'last_name' => 'Doe',
+                'email' => 'jane@example.com',
+                'gender' => 'Female',
+                'biological_sex' => 'Female',
+                'date_of_birth' => '1994-06-17',
+                'country' => 'United States',
+                'ethnicity' => 'White',
+                'allow_trume_login' => true,
+            ]
+        ],
+    ];
+
+    $unregisteredKits = [
+        'KIT_BARCODE_1',
+        'KIT_BARCODE_2',
+        'KIT_BARCODE_3',
+        'KIT_BARCODE_4',
+    ];
+
+    $results = [
+        'bio_age_results' => [
+            [
+                'kit_barcode' => 'TEST1',
+                'chronological_age' => 30.4,
+                'biological_age' => 40.0,
+                'peer_biological_age_score' => 50.0,
+                'collection_date' => '2024-11-11T18:30:12.313127',
+                'share_link' => 'http://app.local/share/VaRwlU0M08ISJy',
+            ],
+        ],
+        'genetic_results' => [
+            [
+                'kit_barcode' => 'TESTSUP',
+                'markers' => [
+                    [
+                        'marker' => 'rs1801131',
+                        'risk' => 'homozygous_normal',
+                        'gene' => 'MTHFR',
+                        'position' => 'A1298C (Glu429Ala)',
+                    ],
+                    [
+                        'marker' => 'rs1801133',
+                        'risk' => 'homozygous_risk',
+                        'gene' => 'MTHFR',
+                        'position' => 'C677T (Ala222Val)',
+                    ],
+                ],
+            ]
+        ]
+    ];
+
+    return view('dashboard.kits', compact('registeredKits', 'unregisteredKits', 'results'));
+})->name('kits');

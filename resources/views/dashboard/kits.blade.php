@@ -19,8 +19,8 @@
                                 <td class="px-6 py-4">{{ $kit['barcode'] }}</td>
                                 <td class="px-6 py-4">{{ $kit['user'] }}</td>
                                 <td class="px-6 py-4 space-x-2 flex flex-row">
-                                    @include('components.modals.edit-kit')
                                     @include('components.modals.user-results', ['results' => $results])
+                                    @include('components.modals.edit-kit')
                                 </td>
                             </tr>
                         @endforeach

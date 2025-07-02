@@ -1,5 +1,9 @@
 <div x-data="{ open: false }">
-    <button @click="open = true" class="text-blue-600 hover:underline cursor-pointer">View</button>
+    <button @click="open = true"
+        class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition cursor-pointer">
+        <x-heroicon-o-eye class="w-4 h-4 mr-1" />
+        View
+    </button>
 
     <div x-show="open" class="fixed inset-0 flex items-center justify-center bg-gray-600/50 z-50" x-cloak>
         <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6 relative">
@@ -48,7 +52,7 @@
 
             <div class="flex justify-end mt-6">
                 <button @click="open = false"
-                    class="px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer">Close</button>
+                    class="px-4 py-2 border rounded-3xl hover:bg-gray-100 cursor-pointer">Close</button>
             </div>
 
             <button @click="open = false"

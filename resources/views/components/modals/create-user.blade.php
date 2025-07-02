@@ -1,8 +1,10 @@
 <div x-data="{ open: false }">
     <button @click="open = true"
-        class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition cursor-pointer">
+        class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-white hover:text-black hover:shadow-xl transition cursor-pointer">
+        <x-heroicon-o-plus class="w-4 h-4 mr-2" />
         Add User
     </button>
+
 
     <div x-show="open" class="fixed inset-0 flex items-center justify-center bg-gray-600/50 z-50" x-cloak>
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
@@ -10,7 +12,6 @@
 
             <form method="POST" action="{{ route('users.store') }}" class="space-y-4">
                 @csrf
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm">First Name</label>
@@ -78,9 +79,9 @@
                 </div>
                 <div class="flex justify-end space-x-2 mt-4">
                     <button type="button" @click="open = false"
-                        class="px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer">Cancel</button>
+                        class="px-4 py-2 border rounded-3xl hover:bg-gray-100 cursor-pointer">Cancel</button>
                     <button type="submit"
-                        class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 cursor-pointer">Create</button>
+                        class="px-4 py-2 bg-gray-600 text-white rounded-3xl hover:bg-gray-700 cursor-pointer">Create</button>
                 </div>
             </form>
 

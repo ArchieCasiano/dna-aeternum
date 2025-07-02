@@ -1,5 +1,7 @@
 <div x-data="{ open: false }">
-    <button @click="open = true" class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 cursor-pointer">
+    <button @click="open = true"
+        class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition cursor-pointer">
+        <x-heroicon-o-tag class="w-4 h-4 mr-2" />
         Assign Kit
     </button>
 

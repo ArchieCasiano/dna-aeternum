@@ -1,5 +1,10 @@
 <div x-data="{ open: false }">
-    <button @click="open = true" class="text-yellow-600 hover:underline cursor-pointer">Edit</button>
+    <button @click="open = true"
+        class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition cursor-pointer">
+        <x-heroicon-o-pencil class="w-4 h-4 mr-1" />
+        Edit
+    </button>
+
 
     <div x-show="open" class="fixed inset-0 flex items-center justify-center bg-gray-600/50 z-50" x-cloak>
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">

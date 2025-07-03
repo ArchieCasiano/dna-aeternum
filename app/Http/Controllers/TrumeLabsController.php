@@ -5,51 +5,63 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\TrumeLabsService;
 
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Services\TrumeLabsService;
+
 class TrumeLabsController extends Controller
 {
-    protected $trumeLabs;
+    protected $service;
 
-    public function __construct(TrumeLabsService $trumeLabs)
+    public function __construct(TrumeLabsService $service)
     {
-        $this->trumeLabs = $trumeLabs;
+        $this->service = $service;
     }
 
-    // 1. Create User
     public function createUser(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-        ]);
-
-        $response = $this->trumeLabs->createUser($validated);
-        return response()->json($response);
+        return response()->json($this->service->createUser($request->all()));
     }
 
-    // 2. Register Test Kit
-    public function registerKit(Request $request)
+    public function updateUser($id, Request $request)
     {
-        $validated = $request->validate([
-            'user_id' => 'required|string',
-            'kit_code' => 'required|string',
-        ]);
-
-        $response = $this->trumeLabs->registerKit($validated);
-        return response()->json($response);
+        return response()->json($this->service->updateUser($id, $request->all()));
     }
 
-    // 3. Retrieve Result
-    public function getResults($kitId)
+    public function getUser(Request $request)
     {
-        $response = $this->trumeLabs->getResults($kitId);
-        return response()->json($response);
+        return response()->json($this->service->getUser($request->all()));
     }
 
+    public function getUnregisteredKits()
+    {
+        return response()->json($this->service->getUnregisteredKits());
+    }
 
-     // 3. Mock Result
-     public function getMock($mock_kitId)
-     {
-         $response = $this->trumeLabs->getMock($mock_kitId);
-         return response()->json($response);
-     }
+    public function registerKit($barcode, Request $request)
+    {
+        return response()->json($this->service->registerKit($barcode, $request->all()));
+    }
+
+    public function updateKit($barcode, Request $request)
+    {
+        return response()->json($this->service->updateKit($barcode, $request->all()));
+    }
+
+    public function getResults(Request $request)
+    {
+        return response()->json($this->service->getResults($request->all()));
+    }
+
+    public function generateKit(Request $request)
+    {
+        return response()->json($this->service->generateKit($request->all()));
+    }
+
+    public function mockKitResult(Request $request)
+    {
+        return response()->json($this->service->mockKitResult($request->all()));
+    }
 }
+

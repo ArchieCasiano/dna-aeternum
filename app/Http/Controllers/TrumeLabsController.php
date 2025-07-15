@@ -15,12 +15,11 @@ class TrumeLabsController extends Controller
         $this->trumeLabs = $trumeLabs;
     }
 
-  
     public function mockKitResult(Request $request)
     {
         try {
-            $q = trim($request->get('q'));
-
+            $q = $request->get('q') ?? $request->get('id') ?? $request->get('email') ?? $request->get('kit_barcode');
+    
             if (!$q) {
                 \Log::warning('Kit search attempted with empty query.');
                 return response()->json([
@@ -29,33 +28,31 @@ class TrumeLabsController extends Controller
                     'data' => []
                 ], 422);
             }
-
+    
             // Determine search type
             $query = [];
-
+    
             if (filter_var($q, FILTER_VALIDATE_EMAIL)) {
                 $query['email'] = $q;
-            } else {
+            } elseif (is_numeric($q)) {
                 $query['id'] = $q;
+            } else {
+                $query['kit_barcode'] = $q;
             }
-            \Log::debug('Request query all:', $request->query());
-
+    
             \Log::info('Kit search query parsed:', $query);
-
-            // Call the service method
+    
             $results = $this->trumeLabs->mockKitResult($query);
-
-            \Log::info('Kit search results:', $results); // works for arrays too
-
-
+    
+            \Log::info('Kit search results:', $results);
+    
             return response()->json([
                 'status' => 'success',
                 'data' => $results
             ], 200);
-
         } catch (\Throwable $e) {
             \Log::error('Kit search error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-
+    
             return response()->json([
                 'status' => 'error',
                 'message' => 'An unexpected error occurred.',
@@ -64,7 +61,6 @@ class TrumeLabsController extends Controller
             ], 500);
         }
     }
-
-
+    
 }
 

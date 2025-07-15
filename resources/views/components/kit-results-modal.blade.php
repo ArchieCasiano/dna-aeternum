@@ -78,11 +78,11 @@
                 @endif
 
                 @if (empty($results['bio_age_results']) && empty($results['genetic_results']))
-                    <p class="text-gray-600">No results available.</p>
+                    <p class="text-gray-600">No results available. Please contact info@aeternum.site for assistance</p>
                 @endif
             @else
                 <h2 class="text-xl font-semibold mb-4">No Kit Found</h2>
-                <p class="text-gray-600">There is no kit registered to that ID or Email.</p>
+                <p class="text-gray-600">There is no kit registered to that ID or Email. Please contact info@aeternum.site for assistance</p>
             @endif
 
             <div class="mt-6 flex justify-end gap-2">

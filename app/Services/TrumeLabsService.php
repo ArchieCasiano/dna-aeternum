@@ -44,5 +44,10 @@ class TrumeLabsService
         return $this->request('get', '/v1/results', [], $query);
     }
 
+    public function getUser(array $query)
+    {
+        return $this->request('get', '/v1/user', [], $query); // will convert to /v1/user?id=... or /v1/user?email=...
+    }
+    
 
 }

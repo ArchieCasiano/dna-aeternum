@@ -11,7 +11,7 @@ Route::prefix('trumelabs')->group(function () {
     Route::patch('/patch-user/{id}', [TrumeLabsController::class, 'updateUser'])->name('users.update');
 
 
-    Route::get('/get-user', [TrumeLabsController::class, 'getUser'])->name('users.show');
+    Route::get('/get-user-query', [TrumeLabsController::class, 'getUserViaApi']);
 
     // KITS
     Route::get('/unregistered-kits', [TrumeLabsController::class, 'getUnregisteredKits']);

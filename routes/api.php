@@ -1,21 +1,30 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrumeLabsController;
 
+
+
 Route::prefix('trumelabs')->group(function () {
-    Route::post('/user', [TrumeLabsController::class, 'createUser']);
-    Route::patch('/user/{id}', [TrumeLabsController::class, 'updateUser']);
-    Route::get('/user', [TrumeLabsController::class, 'getUser']);
+    // USER
+    Route::post('/user', [TrumeLabsController::class, 'createUser'])->name('users.store');
+    Route::patch('/patch-user/{id}', [TrumeLabsController::class, 'updateUser'])->name('users.update');
 
+
+    Route::get('/get-user', [TrumeLabsController::class, 'getUser'])->name('users.show');
+    Route::get('/get-user-query', [TrumeLabsController::class, 'getUserViaApi']);
+    // KITS
     Route::get('/unregistered-kits', [TrumeLabsController::class, 'getUnregisteredKits']);
+
+
     Route::post('/kits/{barcode}/register', [TrumeLabsController::class, 'registerKit']);
-    Route::patch('/kits/{barcode}', [TrumeLabsController::class, 'updateKit']);
+    Route::patch('/kits/{barcode}', [TrumeLabsController::class, 'updateKit']); // TO DO MAY AAYUSIN PA
 
-    Route::get('/results', [TrumeLabsController::class, 'getResults']);
 
-    // staging-only
+    // RESULTS
+    Route::get('/results', [TrumeLabsController::class, 'mockKitResult']);
+
+    // STAGING ONLY (DEV/TESTING)
     Route::post('/generate-kits', [TrumeLabsController::class, 'generateKit']);
     Route::post('/mock-kit-result', [TrumeLabsController::class, 'mockKitResult']);
 });

@@ -1,74 +1,279 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TrumeLabsController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
+| These routes return frontend views or static test data for display.
 */
 
-Route::get('/', fn() => view('auth.login'))->name('login');
+// Route::get('/', fn() => view('auth.login'))->name('login');
+
+// $kits = [
+//     [
+//         'id' => '1',
+//         'email' => 'john@example.com',
+//         'bio_age_results' => [
+//             [
+//                 'kit_barcode' => 'KIT12345',
+//                 'chronological_age' => 30,
+//                 'biological_age' => 28,
+//                 'peer_biological_age_score' => 92,
+//                 'collection_date' => now(),
+//                 'share_link' => 'https://example.com/results/123'
+//             ]
+//         ],
+//         'genetic_results' => [
+//             [
+//                 'kit_barcode' => 'KIT12345',
+//                 'markers' => [
+//                     ['marker' => 'rs123', 'risk' => 'High', 'gene' => 'BRCA1', 'position' => '17q21.31'],
+//                 ]
+//             ]
+//         ]
+//     ],
+//     [
+//         'id' => '2',
+//         'email' => 'jane@example.com',
+//         'bio_age_results' => [],
+//         'genetic_results' => []
+//     ],
+//     [
+//         'id' => '3',
+//         'email' => 'michael@testmail.com',
+//         'bio_age_results' => [
+//             [
+//                 'kit_barcode' => 'KIT56789',
+//                 'chronological_age' => 45,
+//                 'biological_age' => 47,
+//                 'peer_biological_age_score' => 68,
+//                 'collection_date' => now()->subDays(5),
+//                 'share_link' => 'https://example.com/results/567'
+//             ]
+//         ],
+//         'genetic_results' => [
+//             [
+//                 'kit_barcode' => 'KIT56789',
+//                 'markers' => [
+//                     ['marker' => 'rs456', 'risk' => 'Moderate', 'gene' => 'TP53', 'position' => '17p13.1'],
+//                     ['marker' => 'rs789', 'risk' => 'Low', 'gene' => 'APOE', 'position' => '19q13.32'],
+//                 ]
+//             ]
+//         ]
+//     ],
+//     [
+//         'id' => '4',
+//         'email' => 'alice@genetica.org',
+//         'bio_age_results' => [],
+//         'genetic_results' => [
+//             [
+//                 'kit_barcode' => 'KIT99999',
+//                 'markers' => [
+//                     ['marker' => 'rs999', 'risk' => 'High', 'gene' => 'CFTR', 'position' => '7q31.2'],
+//                     ['marker' => 'rs321', 'risk' => 'Low', 'gene' => 'MTHFR', 'position' => '1p36.22'],
+//                 ]
+//             ]
+//         ]
+//     ],
+// ];
+
+
+// // Search route
+// Route::get('/kit-search', function (Illuminate\Http\Request $request) use ($kits) {
+//     $query = $request->get('q');
+//     $result = collect($kits)->first(fn($kit) => $kit['id'] === $query || $kit['email'] === $query);
+
+//     return view('dashboard.kit-search', ['results' => $result]);
+// })->name('kit.search');
+
+
+Route::get('/kit-search', function (Request $request) {
+    $query = $request->get('q');
+
+    if (!$query) {
+        return view('dashboard.kit-search', ['results' => collect(), 'query' => $query]);
+    }
+
+    $controller = app(TrumeLabsController::class);
+    $response = $controller->mockKitResult($request);
+
+    $data = json_decode($response->getContent(), true);
+
+    return view('dashboard.kit-search', [
+        'results' => collect($data['data'] ?? []),
+        'query' => $query
+    ]);
+})->name('kit.search');
+
+Route::view('/', 'dashboard.index-dashboard')->name('index-dashboard');
+
+
+
 Route::view('/register', 'auth.register')->name('register');
-// Route::view('/users', 'dashboard.users')->name('users');
-Route::view('/kits', 'dashboard.kits')->name('kits');
 Route::view('/settings', 'dashboard.settings')->name('settings');
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');
 
-Route::post('/login', function () {
-    return redirect()->route('dashboard');
-});
+// Fake login/redirect logic for demonstration
+Route::post('/login', fn() => redirect()->route('dashboard'));
 
-Route::post('/users', function () {
-    return redirect()->route('users');
+Route::post('/users', function (Request $request) {
+    // Send data to internal API (via controller/service directly instead of Http::post)
+    $controller = app(App\Http\Controllers\TrumeLabsController::class);
+    $response = $controller->createUser($request);
+
+    // Optionally handle success/failure messages here
+    if ($response->status() === 200 || $response->status() === 201) {
+        return redirect()->route('users')->with('success', 'User created successfully.');
+    }
+
+    return back()->withErrors(['error' => 'Failed to create user.'])->withInput();
 })->name('users.store');
 
-Route::put('/users/{id}', function ($id) {
-    return redirect()->route('users')->with('success', 'User updated (fake).');
+
+
+
+Route::put('/patch-user/{id}', function (Request $request, $id) {
+    $controller = app(TrumeLabsController::class);
+    return $controller->updateUser($request, $id);
 })->name('users.update');
 
 
-Route::view('/users', 'dashboard.users', [
-    'users' => [
-        (object) [
-            'id' => 1,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john@example.com',
-            'date_of_birth' => '1994-06-17',
-            'allow_trume_login' => false,
-            'biological_sex' => 'Male',
-            'gender' => 'Male',
-            'country' => 'United States Of America',
-            'ethnicity' => 'White'
-        ],
-        (object) [
-            'id' => 2,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'email' => 'jane@example.com',
-            'date_of_birth' => '1992-03-25',
-            'allow_trume_login' => true,
-            'biological_sex' => 'Female',
-            'gender' => 'Female',
-            'country' => 'Canada',
-            'ethnicity' => 'Asian'
+
+// Mock user list for dashboard view (testing)s
+Route::view('/users', 'dashboard.users')->name('users');
+
+
+// Route::get('/users/{id}', function ($id) {
+//     $controller = app(TrumeLabsController::class);
+//     $user = $controller->showUser($id);
+
+//     return view('users.show', compact('user'));
+// })->name('users.show.web'); // optional alternative name
+
+
+
+// Route::get('/get-user/{id}', function ($id) {
+//     $controller = app(App\Http\Controllers\TrumeLabsController::class);
+//     return response()->json($controller->getUserFromApi(['id' => $id]));
+// });
+
+
+// Route::get('/users-search', function (Request $originalRequest) {
+//     $q = $originalRequest->query('q');
+
+//     if (!$q) {
+//         return view('dashboard.users', ['users' => []]);
+//     }
+
+//     $controller = app(TrumeLabsController::class);
+
+//     // Use the same request but simulate the query string
+//     $request = Request::create('/get-user-query', 'GET');
+//     $request->query->set('q', $q);
+
+//     $response = $controller->getUserViaApi($request);
+
+//     $data = json_decode($response->getContent(), true);
+//     $user = $data['data'] ?? null;
+
+//     return view('dashboard.users', [
+//         'users' => $user ? [(object) $user] : []
+//     ]);
+// })->name('users.search');
+
+Route::get('/users-search', function (Request $originalRequest) {
+    $q = $originalRequest->query('q');
+
+    if (!$q) {
+        return view('dashboard.kit-search', ['results' => null]);
+    }
+
+    $controller = app(TrumeLabsController::class);
+
+    // Forward the request to internal API
+    $apiRequest = Request::create('/get-user-query', 'GET');
+    $apiRequest->query->set('q', $q);
+
+    $response = $controller->getUserViaApi($apiRequest);
+    $userData = json_decode($response->getContent(), true)['data'] ?? null;
+
+    if (!$userData || empty($userData['kits'])) {
+        return view('dashboard.kit-search', ['results' => null]);
+    }
+
+    $bioAgeResults = [];
+    $healthData = [];
+    $kitDetails = [];
+
+    foreach ($userData['kits'] as $kit) {
+        // Biological age display (placeholder logic)
+        $bioAgeResults[] = [
+            'kit_barcode' => $kit['barcode'],
+            'chronological_age' => \Carbon\Carbon::parse($userData['date_of_birth'])->age,
+            'biological_age' => rand(20, 60), // Replace with actual value later
+            'peer_biological_age_score' => rand(50, 100), // Replace with actual value later
+            'collection_date' => $kit['sample_collection_date'],
+            'share_link' => url('/share/' . $kit['barcode']),
+        ];
+
+        // Health data (include all fields)
+        if (!empty($kit['health_status'])) {
+            $healthData[] = [
+                'kit_barcode' => $kit['barcode'],
+                'details' => $kit['health_status'] // No filtering, full structure
+            ];
+        }
+
+        // Full kit metadata
+        $kitDetails[] = [
+            'barcode' => $kit['barcode'],
+            'status' => $kit['status'],
+            'registration_date' => $kit['registration_date'],
+            'sample_collection_date' => $kit['sample_collection_date'],
+            'in_lab_date' => $kit['in_lab_date'],
+            'processed_date' => $kit['processed_date']
+        ];
+    }
+
+    return view('dashboard.kit-search', [
+        'results' => [
+            'user' => [
+                'id' => $userData['id'],
+                'first_name' => $userData['first_name'],
+                'last_name' => $userData['last_name'],
+                'email' => $userData['email'],
+                'phone' => $userData['phone'],
+                'date_of_birth' => $userData['date_of_birth'],
+            ],
+            'bio_age_results' => $bioAgeResults,
+            'kit_details' => $kitDetails,
+            'health_data' => $healthData,
+            'genetic_results' => [] // Add later when ready
         ]
-    ]
-])->name('users');
+    ]);
+})->name('users.search');
+
+
 
 Route::get('/kits', function () {
+    $kitQuery = request('kit_query');
+    // Fetch unregistered kits from TrumeLabs API
+    $controller = app(TrumeLabsController::class);
+    $unregisteredKitsResponse = $controller->getUnregisteredKits();
+    $unregisteredKits = $unregisteredKitsResponse->getData(); // decode JSON response
+
+    // Static registered kits data
     $registeredKits = [
+        $registeredKits =
         [
-            'barcode' => 'KIT123456',
+            'barcode' => 'KIT-4F2A9D8C7E6B1D3C8F2A9E6B7D4C1F8A3E9C2B7D1E6F3A9B6D2F7C4A8E',
             'user' => 'John Doe',
             'user_details' => [
-                'id' => 1,
+                'id' => "21974872103",
                 'first_name' => 'John',
                 'last_name' => 'Doe',
                 'email' => 'john@example.com',
@@ -81,10 +286,42 @@ Route::get('/kits', function () {
             ]
         ],
         [
-            'barcode' => 'KIT654321',
+            'barcode' => 'KIT-3A9F8D7E6C5B2D1A4F7C3E8B9D2F1A6C5B7E3D9A8F2C1B4E7D6C3F1A9B',
             'user' => 'Jane Doe',
             'user_details' => [
-                'id' => 2,
+                'id' => "12389743210",
+                'first_name' => 'Jane',
+                'last_name' => 'Doe',
+                'email' => 'jane@example.com',
+                'gender' => 'Female',
+                'biological_sex' => 'Female',
+                'date_of_birth' => '1994-06-17',
+                'country' => 'United States',
+                'ethnicity' => 'White',
+                'allow_trume_login' => true,
+            ]
+        ],
+        [
+            'barcode' => 'KIT-4F2A9D8C7E6B1D3C8F2A9E6B7D4C1F8A3E9C2B7D1E6F3A9B6D2F7C4A8E',
+            'user' => 'John Doe',
+            'user_details' => [
+                'id' => "21974872103",
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'email' => 'john@example.com',
+                'gender' => 'Male',
+                'biological_sex' => 'Male',
+                'date_of_birth' => '1994-06-17',
+                'country' => 'United States',
+                'ethnicity' => 'White',
+                'allow_trume_login' => true,
+            ]
+        ],
+        [
+            'barcode' => 'KIT-3A9F8D7E6C5B2D1A4F7C3E8B9D2F1A6C5B7E3D9A8F2C1B4E7D6C3F1A9B',
+            'user' => 'Jane Doe',
+            'user_details' => [
+                'id' => "12389743210",
                 'first_name' => 'Jane',
                 'last_name' => 'Doe',
                 'email' => 'jane@example.com',
@@ -98,13 +335,7 @@ Route::get('/kits', function () {
         ],
     ];
 
-    $unregisteredKits = [
-        'KIT_BARCODE_1',
-        'KIT_BARCODE_2',
-        'KIT_BARCODE_3',
-        'KIT_BARCODE_4',
-    ];
-
+    // Static results data
     $results = [
         'bio_age_results' => [
             [
@@ -137,5 +368,30 @@ Route::get('/kits', function () {
         ]
     ];
 
-    return view('dashboard.kits', compact('registeredKits', 'unregisteredKits', 'results'));
+    return view('dashboard.kits', compact('registeredKits', 'unregisteredKits', 'results', 'kitQuery'))
+        ->with('globalRole', 'admin');
 })->name('kits');
+
+
+Route::post('/settings/generate-kit', function (\Illuminate\Http\Request $request) {
+    Http::withHeaders([
+        'App-Key' => '1234',
+        'Content-Type' => 'application/json',
+    ])->post('http://localhost:8080/v1/generate-kits', [
+                'barcode' => $request->barcode,
+                'test_type' => (int) $request->test_type,
+            ]);
+
+    return back()->with('success', 'Test kit generated.');
+})->name('settings.generate-kit');
+
+Route::post('/settings/mock-kit', function (\Illuminate\Http\Request $request) {
+    Http::withHeaders([
+        'App-Key' => '1234',
+        'Content-Type' => 'application/json',
+    ])->post('http://localhost:8080/v1/mock-kit-result', [
+                'barcode' => $request->barcode,
+            ]);
+
+    return back()->with('success', 'Mock kit result triggered.');
+})->name('settings.mock-kit');

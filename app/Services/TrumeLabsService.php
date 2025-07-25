@@ -44,11 +44,11 @@ class TrumeLabsService
         return $this->request('patch', "/v1/user/{$id}", $data); }
     public function getUser(array $query)
 {
-    return $this->request('get', '/v1/user', $query); // will convert to /v1/user?id=... or /v1/user?email=...
+    return $this->request('get', '/v1/user', [], $query); // will convert to /v1/user?id=... or /v1/user?email=...
 }
 
     public function getUnregisteredKits()     { return $this->request('get', '/v1/unregistered-kits'); }
-    public function registerKit($barcode, $data) { return $this->request('post', "/v1/kits/{$barcode}/register", $data); }
+    public function registerKit($barcode, array $data) { return $this->request('post', "/v1/kits/{$barcode}/register", $data); }
     public function updateKit($barcode, $data)   { return $this->request('patch', "/v1/kits/{$barcode}", $data); }
 
     public function mockKitResult(array $query = [])

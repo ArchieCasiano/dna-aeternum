@@ -105,10 +105,43 @@ class TrumeLabsController extends Controller
     {
         return $this->trumeLabs->getUser($query); // This calls the TrumeLabsService logic
     }
-    public function registerKit($barcode, Request $request)
-    {
-        return response()->json($this->trumeLabs->registerKit($barcode, $request->all()));
-    }
+    public function registerKit(Request $request, $barcode)
+{
+    // Validate the input
+    $validated = $request->validate([
+        'user_id' => 'required|string',
+        'height_feet' => 'required|numeric',
+        'height_inches' => 'required|numeric',
+        'weight' => 'required|numeric',
+        'overall_health' => 'nullable|string',
+        'mental_health' => 'nullable|string',
+        'social_life' => 'nullable|string',
+        'stress' => 'nullable|string',
+        'has_cancer' => 'nullable|string',
+        'has_diabetes' => 'nullable|string',
+        'medicine_consumption' => 'nullable|string',
+        'supplement_consumption' => 'nullable|string',
+        'coffee_consumption' => 'nullable|string',
+        'tobacco_consumption' => 'nullable|string',
+        'waking_up_condition' => 'nullable|string',
+        'trouble_sleeping' => 'nullable|string',
+        'alcohol_consumption' => 'nullable|string',
+        'sleep_hours' => 'nullable|string',
+        'physical_activity_days' => 'nullable|string',
+        'registered_at' => 'nullable|date',
+    ]);
+
+    // Force typecasting for TrumeLabs
+    $validated['height_feet'] = (float) $validated['height_feet'];
+    $validated['height_inches'] = (float) $validated['height_inches'];
+    $validated['weight'] = (float) $validated['weight'];
+
+    // Send to service
+    $response = $this->trumeLabs->registerKit($barcode, $validated);
+
+    return response()->json($response);
+}
+
 
     public function updateKit($barcode, Request $request)
     {
@@ -154,6 +187,85 @@ class TrumeLabsController extends Controller
 
     } catch (\Throwable $e) {
         \Log::error('Kit search error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'An unexpected error occurred.',
+            'exception' => $e->getMessage(),
+            'data' => []
+        ], 500);
+    }
+}
+
+public function getUserViaApi(Request $request)
+{
+    try {
+        // Priority: q, then id/email
+        $q = trim($request->get('q'));
+        $id = trim($request->get('id'));
+        $email = trim($request->get('email'));
+
+        // Build query based on which param is present
+        $query = [];
+
+        if ($q) {
+            if (filter_var($q, FILTER_VALIDATE_EMAIL)) {
+                $query['email'] = $q;
+            } elseif (is_numeric($q)) {
+                $query['id'] = $q;
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid query format',
+                    'data' => []
+                ], 422);
+            }
+        } elseif ($email) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid email format',
+                    'data' => []
+                ], 422);
+            }
+            $query['email'] = $email;
+        } elseif ($id) {
+            if (!is_numeric($id)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid ID format',
+                    'data' => []
+                ], 422);
+            }
+            $query['id'] = $id;
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Missing query',
+                'data' => []
+            ], 422);
+        }
+
+        \Log::info('User search query parsed:', $query);
+
+        // Call TrumeLabs API
+        $user = $this->trumeLabs->getUser($query);
+
+        if (!$user || isset($user['error'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $user['error'] ?? 'User not found.',
+                'data' => []
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $user
+        ]);
+
+    } catch (\Throwable $e) {
+        \Log::error('User search error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
         return response()->json([
             'status' => 'error',

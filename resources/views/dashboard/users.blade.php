@@ -3,11 +3,11 @@
 @section('content')
     <div class="p-8 h-screen flex flex-col overflow-hidden">
         <div class="flex justify-center items-center gap-4 mb-8">
-            <form method="GET" action="{{ route('users.show') }}" class="flex-grow">
+            <form method="GET" action="{{ route('users.search') }}" class="flex-grow">
                 <div class="relative">
-                    <input type="text" name="query" placeholder="Search by ID or Email"
+                    <input type="text" name="q" placeholder="Search by ID or Email"
                         class="w-full px-5 py-3 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300"
-                        value="{{ request('query') }}">
+                        value="{{ request('q') }}">
                     <button type="submit"
                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -18,6 +18,7 @@
                     </button>
                 </div>
             </form>
+            
             @if ($globalRole === 'admin')
                 <div class="flex-shrink-0">
                     @include('components.modals.create-user')

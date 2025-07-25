@@ -12,12 +12,12 @@ Route::prefix('trumelabs')->group(function () {
 
 
     Route::get('/get-user', [TrumeLabsController::class, 'getUser'])->name('users.show');
-
+    Route::get('/get-user-query', [TrumeLabsController::class, 'getUserViaApi']);
     // KITS
     Route::get('/unregistered-kits', [TrumeLabsController::class, 'getUnregisteredKits']);
 
 
-    Route::post('/kits/{barcode}/register', [TrumeLabsController::class, 'registerKit']); // TO DO MAY AAYUSIN PA
+    Route::post('/kits/{barcode}/register', [TrumeLabsController::class, 'registerKit']);
     Route::patch('/kits/{barcode}', [TrumeLabsController::class, 'updateKit']); // TO DO MAY AAYUSIN PA
 
 

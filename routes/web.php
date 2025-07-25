@@ -144,78 +144,15 @@ Route::put('/patch-user/{id}', function (Request $request, $id) {
 
 
 // Mock user list for dashboard view (testing)s
-Route::view('/users', 'dashboard.users', [
-    'users' => [
-        (object) [
-            'id' => 82173922381839,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john@example.com',
-            'date_of_birth' => '1994-06-17',
-            'allow_trume_login' => false,
-            'biological_sex' => 'Male',
-            'gender' => 'Male',
-            'country' => 'United States Of America',
-            'ethnicity' => 'White'
-        ],
-        (object) [
-            'id' => 36423218313201,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'email' => 'jane@example.com',
-            'date_of_birth' => '1992-03-25',
-            'allow_trume_login' => true,
-            'biological_sex' => 'Female',
-            'gender' => 'Female',
-            'country' => 'Canada',
-            'ethnicity' => 'Asian'
-        ],
-        (object) [
-            'id' => 36423218313201,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'email' => 'jane@example.com',
-            'date_of_birth' => '1992-03-25',
-            'allow_trume_login' => true,
-            'biological_sex' => 'Female',
-            'gender' => 'Female',
-            'country' => 'Canada',
-            'ethnicity' => 'Asian'
-        ],
-        (object) [
-            'id' => 36423218313201,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'email' => 'jane@example.com',
-            'date_of_birth' => '1992-03-25',
-            'allow_trume_login' => true,
-            'biological_sex' => 'Female',
-            'gender' => 'Female',
-            'country' => 'Canada',
-            'ethnicity' => 'Asian'
-        ],
-        (object) [
-            'id' => 36423218313201,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'email' => 'jane@example.com',
-            'date_of_birth' => '1992-03-25',
-            'allow_trume_login' => true,
-            'biological_sex' => 'Female',
-            'gender' => 'Female',
-            'country' => 'Canada',
-            'ethnicity' => 'Asian'
-        ],
-    ]
-])->name('users');
+Route::view('/users', 'dashboard.users')->name('users');
 
 
-Route::get('/users/{id}', function ($id) {
-    $controller = app(TrumeLabsController::class);
-    $user = $controller->showUser($id);
+// Route::get('/users/{id}', function ($id) {
+//     $controller = app(TrumeLabsController::class);
+//     $user = $controller->showUser($id);
 
-    return view('users.show', compact('user'));
-})->name('users.show.web'); // optional alternative name
+//     return view('users.show', compact('user'));
+// })->name('users.show.web'); // optional alternative name
 
 
 
@@ -224,6 +161,101 @@ Route::get('/users/{id}', function ($id) {
 //     return response()->json($controller->getUserFromApi(['id' => $id]));
 // });
 
+
+// Route::get('/users-search', function (Request $originalRequest) {
+//     $q = $originalRequest->query('q');
+
+//     if (!$q) {
+//         return view('dashboard.users', ['users' => []]);
+//     }
+
+//     $controller = app(TrumeLabsController::class);
+
+//     // Use the same request but simulate the query string
+//     $request = Request::create('/get-user-query', 'GET');
+//     $request->query->set('q', $q);
+
+//     $response = $controller->getUserViaApi($request);
+
+//     $data = json_decode($response->getContent(), true);
+//     $user = $data['data'] ?? null;
+
+//     return view('dashboard.users', [
+//         'users' => $user ? [(object) $user] : []
+//     ]);
+// })->name('users.search');
+
+Route::get('/users-search', function (Request $originalRequest) {
+    $q = $originalRequest->query('q');
+
+    if (!$q) {
+        return view('dashboard.kit-search', ['results' => null]);
+    }
+
+    $controller = app(TrumeLabsController::class);
+
+    // Forward the request to internal API
+    $apiRequest = Request::create('/get-user-query', 'GET');
+    $apiRequest->query->set('q', $q);
+
+    $response = $controller->getUserViaApi($apiRequest);
+    $userData = json_decode($response->getContent(), true)['data'] ?? null;
+
+    if (!$userData || empty($userData['kits'])) {
+        return view('dashboard.kit-search', ['results' => null]);
+    }
+
+    $bioAgeResults = [];
+    $healthData = [];
+    $kitDetails = [];
+
+    foreach ($userData['kits'] as $kit) {
+        // Biological age display (placeholder logic)
+        $bioAgeResults[] = [
+            'kit_barcode' => $kit['barcode'],
+            'chronological_age' => \Carbon\Carbon::parse($userData['date_of_birth'])->age,
+            'biological_age' => rand(20, 60), // Replace with actual value later
+            'peer_biological_age_score' => rand(50, 100), // Replace with actual value later
+            'collection_date' => $kit['sample_collection_date'],
+            'share_link' => url('/share/' . $kit['barcode']),
+        ];
+
+        // Health data (include all fields)
+        if (!empty($kit['health_status'])) {
+            $healthData[] = [
+                'kit_barcode' => $kit['barcode'],
+                'details' => $kit['health_status'] // No filtering, full structure
+            ];
+        }
+
+        // Full kit metadata
+        $kitDetails[] = [
+            'barcode' => $kit['barcode'],
+            'status' => $kit['status'],
+            'registration_date' => $kit['registration_date'],
+            'sample_collection_date' => $kit['sample_collection_date'],
+            'in_lab_date' => $kit['in_lab_date'],
+            'processed_date' => $kit['processed_date']
+        ];
+    }
+
+    return view('dashboard.kit-search', [
+        'results' => [
+            'user' => [
+                'id' => $userData['id'],
+                'first_name' => $userData['first_name'],
+                'last_name' => $userData['last_name'],
+                'email' => $userData['email'],
+                'phone' => $userData['phone'],
+                'date_of_birth' => $userData['date_of_birth'],
+            ],
+            'bio_age_results' => $bioAgeResults,
+            'kit_details' => $kitDetails,
+            'health_data' => $healthData,
+            'genetic_results' => [] // Add later when ready
+        ]
+    ]);
+})->name('users.search');
 
 
 
